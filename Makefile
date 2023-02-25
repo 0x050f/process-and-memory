@@ -9,3 +9,9 @@ all:
 	(grep sys_get_pid_info $(KERNEL_PATH)/include/linux/syscalls.h) || sed -i '$$ i\asmlinkage long sys_get_pid_info(struct pid_info *ret, int pid);' $(KERNEL_PATH)/include/linux/syscalls.h
 	make -C $(KERNEL_PATH)
 	make -C $(KERNEL_PATH) modules_install install
+
+clean:
+	rm -rf $(KERNEL_PATH)/sys_get_pid_info/
+	sed -i ' s/ sys_get_pid_info\///' $(KERNEL_PATH)/Makefile
+	sed -i '/sys_get_pid_info/d' $(KERNEL_PATH)/arch/x86/entry/syscalls/syscall_64.tbl
+	sed -i '/sys_get_pid_info/d' $(KERNEL_PATH)/include/linux/syscalls.h
