@@ -15,8 +15,9 @@ struct pid_info {
 
 SYSCALL_DEFINE2(get_pid_info, struct pid_info *, pid_info, int, pid)
 {
+	pid_info->pid = pid;
 	(void)pid_info;
 	(void)pid;
-	printk("Hello World\n");
+	printk("Hello W0rld\n");
 	return (0);
 }
