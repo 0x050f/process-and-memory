@@ -1,0 +1,7 @@
+--- syscall_64.tbl.orig	2023-03-04 11:06:24.198612906 +0100
++++ syscall_64.tbl	2023-03-04 11:18:25.782124618 +0100
+@@ -417,3 +417,4 @@
+ 547	x32	pwritev2		compat_sys_pwritev64v2
+ # This is the end of the legacy x32 range.  Numbers 548 and above are
+ # not special and are not to be used for x32-specific syscalls.
++548	64	get_pid_info		sys_get_pid_info

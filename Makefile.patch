@@ -1,0 +1,11 @@
+--- Makefile.orig	2023-03-04 11:40:03.389641516 +0100
++++ Makefile	2023-03-04 11:41:53.744773316 +0100
+@@ -1091,7 +1091,7 @@
+ export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+-core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/
++core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ sys_get_pid_info/
+ core-$(CONFIG_BLOCK)	+= block/
+ 
+ vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, \
