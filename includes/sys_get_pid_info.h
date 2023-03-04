@@ -10,8 +10,10 @@ struct pid_info {
 	uint8_t				state;
 	void				*stack;
 	struct timeval		time;
-	pid_t				*child_pids;
-	pid_t				parent_pid;
+	pid_t				parent;
+	size_t				nb_children;
+	pid_t				*children;
+	size_t				children_len;
 	char				*execpath;
 	char				*fullpath;
 };
