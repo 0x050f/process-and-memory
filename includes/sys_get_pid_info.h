@@ -10,7 +10,7 @@ struct pid_info {
 	pid_t				pid;
 	uint8_t				state;
 	void				*stack;
-	struct timeval		time;
+	struct timespec		time;
 	pid_t				parent;
 	size_t				nb_children;
 	pid_t				*children;

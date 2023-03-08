@@ -7,6 +7,8 @@
 #include <linux/syscalls.h>
 #include <linux/time.h>
 
+# define NS
+
 //TODO: move exe, root, pwd to MAX_PATH static buffer ?
 
 struct pid_info {
@@ -115,6 +117,7 @@ SYSCALL_DEFINE2(get_pid_info, struct pid_info __user *, pid_info, int, pid)
 				return (-EFAULT);
 			tmp += 1;
 		}
+		kpid_info.time = ns_to_timespec64((ktime_get_ns() - tsk->start_time));
 		if (copy_to_user(pid_info, &kpid_info, sizeof(struct pid_info) - (sizeof(char *) * 3))) {
 			kfree(kpid_info.exe);
 			return (-EFAULT);

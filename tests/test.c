@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 #include "../includes/sys_get_pid_info.h"
 
 int		main(void) {
@@ -30,6 +31,7 @@ int		main(void) {
 		printf("root: %s\n", info.root);
 		printf("pwd: %s\n", info.pwd);
 		printf("stack: %p\n", info.stack);
+		printf("time: %lld.%.9ld sec\n", (long long)info.time.tv_sec, info.time.tv_nsec);
 	} else {
 		sleep(10);
 	}
