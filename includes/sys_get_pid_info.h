@@ -1,9 +1,10 @@
 #ifndef SYS_GET_PID_INFO_H
 # define SYS_GET_PID_INFO_H
 
+#include <limits.h>
+#include <stdint.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <stdint.h>
 
 struct pid_info {
 	pid_t				pid;
@@ -14,8 +15,9 @@ struct pid_info {
 	size_t				nb_children;
 	pid_t				*children;
 	size_t				children_len;
-	char				*execpath;
-	char				*fullpath;
+	char				*exe;
+	char				*root;
+	char				*pwd;
 };
 
 #endif
