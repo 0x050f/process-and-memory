@@ -47,7 +47,9 @@ int				get_pwd(char * __user dst, size_t len, struct task_struct *tsk)
 		return (-ENOMEM);
 	get_fs_pwd(tsk->fs, &pwd);
 	path = d_path(&pwd, buffer, len);
-	if (copy_to_user(dst, path, len))
+	if (len < strlen(path))
+		ret = -ENOMEM;
+	if (!ret && copy_to_user(dst, path, strlen(path)))
 		ret = -EFAULT;
 	kfree(buffer);
 	return (ret);
@@ -66,7 +68,9 @@ int				get_root(char * __user dst, size_t len, struct task_struct *tsk)
 		return (-ENOMEM);
 	get_fs_root(tsk->fs, &root);
 	path = d_path(&root, buffer, len);
-	if (copy_to_user(dst, path, len))
+	if (len < strlen(path))
+		ret = -ENOMEM;
+	if (!ret && copy_to_user(dst, path, strlen(path)))
 		ret = -EFAULT;
 	kfree(buffer);
 	return (ret);
@@ -85,14 +89,18 @@ int				get_exe(char * __user dst, size_t len, struct task_struct *tsk)
 		return (-ENOMEM);
 	exe_file = get_task_exe_file(tsk);
 	if (!exe_file) {
-		if (copy_to_user(dst, "", len))
+		if (copy_to_user(dst, "[", 1) ||
+			copy_to_user(dst + 1, tsk->comm, strlen(tsk->comm)) ||
+			copy_to_user(dst + strlen(tsk->comm) + 1, "]", 1))
 			ret = -EFAULT;
 		kfree(buffer);
 		return (ret);
 	}
 	path_get(&exe_file->f_path);
 	path = file_path(exe_file, buffer, len);
-	if (copy_to_user(dst, path, len))
+	if (len < strlen(path))
+		ret = -ENOMEM;
+	if (!ret && copy_to_user(dst, path, strlen(path)))
 		ret = -EFAULT;
 	kfree(buffer);
 	return (ret);
@@ -133,15 +141,24 @@ SYSCALL_DEFINE2(get_pid_info, struct pid_info __user *, pid_info, int, pid)
 			return (-EFAULT);
 		}
 		// exe - root - pwd
-		ret = get_exe(pid_info->exe, PATH_MAX, tsk);
-		if (ret)
-			return (ret);
-		ret = get_root(pid_info->root, PATH_MAX, tsk);
-		if (ret)
-			return (ret);
-		ret = get_pwd(pid_info->pwd, PATH_MAX, tsk);
-		if (ret)
-			return (ret);
+		printk("exe\n");
+		if (pid_info->exe) {
+			ret = get_exe(pid_info->exe, PATH_MAX, tsk);
+			if (ret)
+				return (ret);
+		}
+		printk("root\n");
+		if (pid_info->root) {
+			ret = get_root(pid_info->root, PATH_MAX, tsk);
+			if (ret)
+				return (ret);
+		}
+		printk("pwd\n");
+		if (pid_info->pwd) {
+			ret = get_pwd(pid_info->pwd, PATH_MAX, tsk);
+			if (ret)
+				return (ret);
+		}
 		return (0);
 	}
 	return (-ESRCH);
