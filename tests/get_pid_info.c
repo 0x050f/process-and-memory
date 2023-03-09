@@ -11,6 +11,10 @@ int		main(int argc, char *argv[]) {
 	pid_t				pid;
 	struct pid_info		info;
 
+	if (argc != 2) {
+		dprintf(STDERR_FILENO, "usage: %s PID\n", argv[0]);
+		return (1);
+	}
 	bzero(&info, sizeof(struct pid_info));
 	info.children = malloc(4096);
 	info.exe = malloc(4096);
@@ -25,14 +29,14 @@ int		main(int argc, char *argv[]) {
 		return (1);
 	}
 	info.children_len = 4096;
-	if (argc != 2) {
-		dprintf(STDERR_FILENO, "usage: %s PID\n", argv[0]);
-		return (1);
-	}
 	pid = atoi(argv[1]);
 	ret = syscall(__NR_get_pid_info, &info, pid);
 	if (ret) {
 		dprintf(STDERR_FILENO, "%s: [Errno %d]: %s\n", argv[0], errno, strerror(errno));
+		free(info.children);
+		free(info.exe);
+		free(info.root);
+		free(info.pwd);
 		return (ret);
 	}
 	printf("Process Information:\n");
@@ -51,6 +55,7 @@ int		main(int argc, char *argv[]) {
 	printf("exe: %s\n", info.exe);
 	printf("root: %s\n", info.root);
 	printf("pwd: %s\n", info.pwd);
+	free(info.children);
 	free(info.exe);
 	free(info.root);
 	free(info.pwd);
