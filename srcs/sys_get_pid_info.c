@@ -141,19 +141,16 @@ SYSCALL_DEFINE2(get_pid_info, struct pid_info __user *, pid_info, int, pid)
 			return (-EFAULT);
 		}
 		// exe - root - pwd
-		printk("exe\n");
 		if (pid_info->exe) {
 			ret = get_exe(pid_info->exe, PATH_MAX, tsk);
 			if (ret)
 				return (ret);
 		}
-		printk("root\n");
 		if (pid_info->root) {
 			ret = get_root(pid_info->root, PATH_MAX, tsk);
 			if (ret)
 				return (ret);
 		}
-		printk("pwd\n");
 		if (pid_info->pwd) {
 			ret = get_pwd(pid_info->pwd, PATH_MAX, tsk);
 			if (ret)
