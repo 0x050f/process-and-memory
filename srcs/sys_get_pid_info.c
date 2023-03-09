@@ -7,18 +7,27 @@
 #include <linux/syscalls.h>
 #include <linux/time.h>
 
-# define NS
-
-//TODO: move exe, root, pwd to MAX_PATH static buffer ?
+/*
+ * State in 'RSDTtXZPI':
+ * 'R': running
+ * 'S': sleeping
+ * 'D': disk sleep
+ * 'T': stopped
+ * 't': tracing stop
+ * 'X': dead
+ * 'Z': zombie
+ * 'P': parked
+ * 'I': idle
+*/
 
 struct pid_info {
 	pid_t				pid;
-	uint8_t				state; // TODO
+	char				state;
+	struct timespec64	time;
 	void				*stack;
-	struct timespec64	time; // TODO
 	pid_t				parent;
 	size_t				nb_children;
-	pid_t				*children;
+	pid_t				*children; // array
 	size_t				children_len;
 	char				*exe;
 	char				*root;
@@ -103,6 +112,8 @@ SYSCALL_DEFINE2(get_pid_info, struct pid_info __user *, pid_info, int, pid)
 	tsk = find_task_by_vpid(pid);
 	if (tsk) {
 		kpid_info.parent = tsk->parent->pid;
+		kpid_info.state = task_state_to_char(tsk);
+		kpid_info.time = ns_to_timespec64((ktime_get_ns() - tsk->start_time));
 		kpid_info.stack = tsk->stack;
 		kpid_info.nb_children = 0;
 		list_for_each_entry(child, &tsk->children, sibling) {
@@ -117,7 +128,6 @@ SYSCALL_DEFINE2(get_pid_info, struct pid_info __user *, pid_info, int, pid)
 				return (-EFAULT);
 			tmp += 1;
 		}
-		kpid_info.time = ns_to_timespec64((ktime_get_ns() - tsk->start_time));
 		if (copy_to_user(pid_info, &kpid_info, sizeof(struct pid_info) - (sizeof(char *) * 3))) {
 			kfree(kpid_info.exe);
 			return (-EFAULT);

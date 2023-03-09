@@ -17,13 +17,15 @@ int		main(void) {
 	info.exe = (char *)exe;
 	info.pwd = (char *)pwd;
 	if (fork()) {
-		int ret = syscall(548, &info, getpid());
+		int ret = syscall(__NR_get_pid_info, &info, getpid());
 		printf("ret: %d\n", ret);
 		if (ret < 0) {
 			dprintf(STDERR_FILENO, "errno: %s\n", strerror(errno));
 			return (ret);
 		}
 		printf("pid: %u\n", info.pid);
+		printf("state: '%c'\n", info.state);
+		printf("time: %lld.%.9ld sec\n", (long long)info.time.tv_sec, info.time.tv_nsec);
 		printf("parent pid: %u\n", info.parent);
 		for (size_t i = 0; i < info.nb_children; i++)
 			printf("child[%zu] pid: %u\n", i, info.children[i]);
@@ -31,7 +33,6 @@ int		main(void) {
 		printf("root: %s\n", info.root);
 		printf("pwd: %s\n", info.pwd);
 		printf("stack: %p\n", info.stack);
-		printf("time: %lld.%.9ld sec\n", (long long)info.time.tv_sec, info.time.tv_nsec);
 	} else {
 		sleep(10);
 	}
